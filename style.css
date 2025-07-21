@@ -1,86 +1,185 @@
+/* Base page styling */
 body {
-  background: #f5f5f5;
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+  background-color: #f5f5f5;
+  padding: 40px 30px;
   margin: 0;
-  padding: 0;
+  color: #333;
 }
 
-header {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem;
-  background: #222;
-  height: 80px; /* Increased height */
+h1 {
+  font-size: 2rem;
+  text-align: left;
+  margin-bottom: 30px;
 }
 
-#logo {
-  height: 7rem; /* Bigger logo */
-  margin-right: 1.5rem;
-}
-
-#searchBar {
-  flex: 1;
-  padding: 0.7rem 1rem;
-  font-size: 1.1rem;
-  border-radius: 4px;
-  border: none;
-  outline: none;
-}
-
-#bookshelf {
+/* Apple Books-style bookshelf layout */
+.bookshelf {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 32px 24px;
+  justify-content: start;
+  padding: 2rem 1rem;
+  position: relative;
+  background: lightblue;
+  background-size:auto;
+  background-repeat: no-repeat;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 
-/* Shared book card */
-.book {
-  background: white;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  text-align: center;
-  border-radius: 5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+/* Comic Book Card */
+.comic-card {
+  width: 160px;
+  height: 240px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Cover image */
-.book img,
-.book-placeholder {
+.comic-card img {
   width: 100%;
   height: 200px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 4px;
+  object-fit: cover;
+  background-color: #eee;
 }
 
-/* "Add Book" styled like a placeholder book */
-.book-placeholder {
+.comic-card h3 {
+  font-size: 0.9rem;
+  margin: 6px;
+  text-align: center;
+  padding: 0 6px;
+}
+
+/* Add Book Card */
+.add-book-card {
+  width: 160px;
+  height: 240px;
+  background: linear-gradient(to bottom right, #e0e0e0, #d0d0d0);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e0e0e0;
-  color: #555;
   font-size: 3rem;
   font-weight: bold;
+  color: #888;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.add-book:hover .book-placeholder {
-  background-color: #d4d4d4;
+/* Hover effects for all books */
+.comic-card:hover,
+.add-book-card:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
-/* Optional button styling */
-.book button {
-  margin-top: 0.5rem;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.9rem;
-  cursor: pointer;
+/* Add Book Panel */
+.panel {
+  max-width: 600px;
+  margin: 20px auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.hidden {
+  display: none;
+}
+
+/* Search Bar + Button */
+.search-bar-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.search-bar-container input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.search-bar-container button {
+  padding: 8px 14px;
   border: none;
   background-color: #007aff;
   color: white;
-  border-radius: 3px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
 }
 
+.search-bar-container button:hover {
+  background-color: #005ecb;
+}
 
+/* Search results */
+#searchResults {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #f3f3f3;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-result:hover {
+  background-color: #e0e0e0;
+}
+
+.search-result img {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #ddd;
+}
+
+.search-result span {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Show more link */
+.show-more {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #007aff;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.show-more:hover {
+  background-color: #f0f0f0;
+}
+
+/* Loading state */
+.search-loading {
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  color: #666;
+}

@@ -7,13 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <h1>DC Comics Bookshelf</h1>
+  <div id="bookshelf" class="bookshelf"></div>
 
-  <header>
-    <img id="logo" src="assets/logo.png" alt="DC Comics Logo" />
-    <input type="text" id="searchBar" placeholder="Search for a DC comic book..." />
-  </header>
-
-  <div id="bookshelf"></div>
+  <div id="addBookPanel" class="panel hidden">
+    <div class="search-bar-container">
+      <input type="text" id="addBookSearch" placeholder="Search for a comic...">
+      <button id="addBookSearchBtn">Search</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
