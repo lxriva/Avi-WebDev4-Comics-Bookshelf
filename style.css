@@ -1,0 +1,86 @@
+body {
+  background: #f5f5f5;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: #222;
+  height: 80px; /* Increased height */
+}
+
+#logo {
+  height: 7rem; /* Bigger logo */
+  margin-right: 1.5rem;
+}
+
+#searchBar {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  font-size: 1.1rem;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+}
+
+#bookshelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Shared book card */
+.book {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Cover image */
+.book img,
+.book-placeholder {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+}
+
+/* "Add Book" styled like a placeholder book */
+.book-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  color: #555;
+  font-size: 3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-book:hover .book-placeholder {
+  background-color: #d4d4d4;
+}
+
+/* Optional button styling */
+.book button {
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  background-color: #007aff;
+  color: white;
+  border-radius: 3px;
+}
+
+
