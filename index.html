@@ -415,26 +415,20 @@
 
         card.appendChild(img);
         card.appendChild(title);
-
         bookshelf.appendChild(card);
       });
     }
 
-    async function searchMetron(query, page = 1) {
+    async function searchSuperHeroes(query, page = 1) {
       const searchResults = document.getElementById("searchResults");
       if (page === 1) {
-        searchResults.innerHTML = "<div class='search-loading'>Searching Metron Comic Database...</div>";
+        searchResults.innerHTML = "<div class='search-loading'>Searching SuperHero Database...</div>";
       }
 
       try {
-        // Use CORS proxy to access Metron API
-        const corsProxy = 'https://api.allorigins.win/raw?url=';
-        const apiUrl = `https://metron.cloud/api/issue/?search=${encodeURIComponent(query)}&page=${page}`;
-        const proxyUrl = corsProxy + encodeURIComponent(apiUrl);
-
-        console.log(`Trying API via CORS proxy: ${apiUrl}`);
+        console.log(`Searching for: ${query}`);
         
-        const res = await fetch(proxyUrl, {
+        const res = await fetch('https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/all.json', {
           method: 'GET',
           headers: {
             'Accept': 'application/json'
@@ -445,67 +439,76 @@
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         
-        const response = await res.json();
-        console.log('API Response:', response);
+        const allHeroes = await res.json();
+        console.log('API Response:', allHeroes.length, 'heroes loaded');
 
+        let filteredResults = allHeroes.filter(hero => {
+          const nameMatch = hero.name.toLowerCase().includes(query.toLowerCase()) ||
+                           (hero.biography.fullName && hero.biography.fullName.toLowerCase().includes(query.toLowerCase())) ||
+                           (hero.biography.aliases && hero.biography.aliases.some(alias => 
+                             alias.toLowerCase().includes(query.toLowerCase())));
+          
+          const isDC = hero.biography.publisher === 'DC Comics';
+          return nameMatch && isDC;
+        });
 
+        if (filteredResults.length === 0) {
+          filteredResults = allHeroes.filter(hero => {
+            return hero.name.toLowerCase().includes(query.toLowerCase()) ||
+                   (hero.biography.fullName && hero.biography.fullName.toLowerCase().includes(query.toLowerCase())) ||
+                   (hero.biography.aliases && hero.biography.aliases.some(alias => 
+                     alias.toLowerCase().includes(query.toLowerCase())));
+          });
+        }
 
         if (page === 1) searchResults.innerHTML = "";
 
-        // Handle different possible response structures
-        let results = [];
-        if (response.results) {
-          results = response.results;
-        } else if (response.data) {
-          results = response.data;
-        } else if (Array.isArray(response)) {
-          results = response;
-        }
-
-        if (results.length === 0 && page === 1) {
-          searchResults.innerHTML = "<div class='search-loading'>No comics found. Try different search terms.</div>";
+        if (filteredResults.length === 0) {
+          searchResults.innerHTML = "<div class='search-loading'>No superheroes found. Try different search terms.</div>";
           return;
         }
 
-        results.forEach(result => {
+        const itemsPerPage = 10;
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedResults = filteredResults.slice(startIndex, endIndex);
+
+        paginatedResults.forEach(hero => {
           const div = document.createElement("div");
           div.className = "search-result";
 
           const img = document.createElement("img");
-          // Handle different possible image field names
-          const imageUrl = result.image || result.cover_image || result.thumbnail || result.cover || '';
-          img.src = imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iOTAiIHZpZXdCb3g9IjAgMCA2MCA5MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjRTlFQ0VGIi8+Cjx0ZXh0IHg9IjMwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNkM3NTdEIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+";
-          img.alt = result.title || result.name || "Comic";
+          img.src = hero.images.md || hero.images.sm || hero.images.lg || '';
+          img.alt = hero.name;
 
           const infoDiv = document.createElement("div");
           infoDiv.className = "search-result-info";
 
           const titleSpan = document.createElement("div");
           titleSpan.className = "search-result-title";
-          titleSpan.textContent = result.title || result.name || result.series_name || "Untitled Comic";
+          titleSpan.textContent = hero.name;
 
           const detailsSpan = document.createElement("div");
           detailsSpan.className = "search-result-details";
           
-          // Build details string from available data
           const details = [];
-          if (result.series) details.push(result.series);
-          if (result.issue_number) details.push(`#${result.issue_number}`);
-          if (result.cover_date) details.push(result.cover_date);
-          if (result.year) details.push(result.year);
+          if (hero.biography.fullName && hero.biography.fullName !== hero.name) {
+            details.push(hero.biography.fullName);
+          }
+          if (hero.biography.publisher) details.push(hero.biography.publisher);
+          if (hero.biography.firstAppearance) details.push(`First: ${hero.biography.firstAppearance}`);
           
-          detailsSpan.textContent = details.join(' • ') || 'DC Comics';
+          detailsSpan.textContent = details.join(' • ');
 
           infoDiv.appendChild(titleSpan);
           infoDiv.appendChild(detailsSpan);
-
           div.appendChild(img);
           div.appendChild(infoDiv);
 
           div.onclick = () => {
             const bookToAdd = {
-              title: result.title || result.name || result.series_name || "Untitled Comic",
-              image: imageUrl
+              title: hero.name,
+              image: hero.images.lg || hero.images.md || hero.images.sm || ''
             };
             myBooks.push(bookToAdd);
             renderBooks();
@@ -515,11 +518,10 @@
           searchResults.appendChild(div);
         });
 
-        // Add "Load more" button if there might be more results
-        if (results.length >= 10 || (response.next && response.next !== null)) {
+        if (endIndex < filteredResults.length) {
           const showMore = document.createElement("div");
           showMore.className = "show-more";
-          showMore.textContent = "Load more...";
+          showMore.textContent = `Load more... (${filteredResults.length - endIndex} remaining)`;
           showMore.onclick = () => {
             currentPage++;
             searchSuperHeroes(currentQuery, currentPage);
@@ -529,11 +531,7 @@
 
       } catch (error) {
         console.error('Search error:', error);
-        const errorMessage = error.message.includes('CORS') 
-          ? "CORS Error: The Metron API doesn't allow direct browser requests. You'll need a backend server to proxy the requests."
-          : `Search failed: ${error.message}`;
-        
-        searchResults.innerHTML = `<div class='search-error'>${errorMessage}<br><br>Try checking the browser console for more details.</div>`;
+        searchResults.innerHTML = `<div class='search-error'>Search failed: ${error.message}<br><br>Please try again or check your internet connection.</div>`;
       }
     }
 
