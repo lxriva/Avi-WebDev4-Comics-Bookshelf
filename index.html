@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Marvel Comics Bookshelf</title>
+  <title>DC Comics Bookshelf</title>
   <style>
     /* Base page styling */
     body {
@@ -369,7 +369,7 @@
   </style>
 </head>
 <body>
-  <h1>DC Comics Bookshelf</h1>
+  <h1>Marvel Comics Bookshelf</h1>
   <div id="bookshelf" class="bookshelf"></div>
 
   <div id="addBookPanel" class="panel hidden">
@@ -520,19 +520,17 @@
         const limit = 20;
         const offset = (page - 1) * limit;
         
-        // Build the API URL
-        const apiUrl = `https://gateway.marvel.com/v1/public/comics?` +
-          `titleStartsWith=${encodeURIComponent(query)}&` +
+        // Build the API URL for series instead of individual comics
+        const apiUrl = `https://gateway.marvel.com/v1/public/series?` +
+          `title=${encodeURIComponent(query)}&` +
           `limit=${limit}&` +
           `offset=${offset}&` +
           `ts=${timestamp}&` +
           `apikey=${MARVEL_PUBLIC_KEY}&` +
           `hash=${hash}&` +
-          `formatType=comic&` +
-          `noVariants=true&` +
-          `orderBy=-onsaleDate`;
+          `orderBy=-startYear`;
         
-        const res = await fetch(apiUrl, {
+        let res = await fetch(apiUrl, {
           method: 'GET',
           headers: {
             'Accept': 'application/json'
@@ -543,48 +541,81 @@
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         
-        const data = await res.json();
+        let data = await res.json();
+        
+        // If no exact title matches, try with titleStartsWith
+        if (!data.data || !data.data.results || data.data.results.length === 0) {
+          const fallbackUrl = `https://gateway.marvel.com/v1/public/series?` +
+            `titleStartsWith=${encodeURIComponent(query)}&` +
+            `limit=${limit}&` +
+            `offset=${offset}&` +
+            `ts=${timestamp}&` +
+            `apikey=${MARVEL_PUBLIC_KEY}&` +
+            `hash=${hash}&` +
+            `orderBy=-startYear`;
+          
+          res = await fetch(fallbackUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+           
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          
+          data = await res.json();
+        }
         console.log('Marvel API Response:', data);
 
         if (page === 1) searchResults.innerHTML = "";
 
         if (!data.data || !data.data.results || data.data.results.length === 0) {
-          searchResults.innerHTML = "<div class='search-loading'>No comics found. Try different search terms like 'Spider-Man', 'X-Men', or 'Avengers'.</div>";
+          searchResults.innerHTML = "<div class='search-loading'>No comic series found. Try different search terms like 'Spider-Man', 'X-Men', or 'Avengers'.</div>";
           return;
         }
 
-        const comics = data.data.results;
+        const series = data.data.results;
 
-        comics.forEach(comic => {
+        series.forEach(seriesItem => {
           const div = document.createElement("div");
           div.className = "search-result";
 
           const img = document.createElement("img");
-          const thumbnail = comic.thumbnail;
+          const thumbnail = seriesItem.thumbnail;
           img.src = thumbnail ? `${thumbnail.path}.${thumbnail.extension}` : '';
-          img.alt = comic.title;
+          img.alt = seriesItem.title;
 
           const infoDiv = document.createElement("div");
           infoDiv.className = "search-result-info";
 
           const titleSpan = document.createElement("div");
           titleSpan.className = "search-result-title";
-          titleSpan.textContent = comic.title;
+          titleSpan.textContent = seriesItem.title;
 
           const detailsSpan = document.createElement("div");
           detailsSpan.className = "search-result-details";
           
           const details = [];
-          if (comic.issueNumber) details.push(`Issue #${comic.issueNumber}`);
-          if (comic.dates && comic.dates.length > 0) {
-            const onsaleDate = comic.dates.find(date => date.type === 'onsaleDate');
-            if (onsaleDate) {
-              const date = new Date(onsaleDate.date).getFullYear();
-              details.push(`${date}`);
+          
+          // Add year range
+          if (seriesItem.startYear) {
+            if (seriesItem.endYear && seriesItem.endYear !== seriesItem.startYear) {
+              details.push(`${seriesItem.startYear} - ${seriesItem.endYear}`);
+            } else {
+              details.push(`${seriesItem.startYear}${seriesItem.endYear ? '' : ' - Present'}`);
             }
           }
-          if (comic.creators && comic.creators.items.length > 0) {
-            const writer = comic.creators.items.find(creator => creator.role === 'writer');
+          
+          // Add issue count
+          if (seriesItem.comics && seriesItem.comics.available) {
+            details.push(`${seriesItem.comics.available} issues`);
+          }
+          
+          // Add creators if available
+          if (seriesItem.creators && seriesItem.creators.items.length > 0) {
+            const writer = seriesItem.creators.items.find(creator => creator.role === 'writer');
             if (writer) details.push(writer.name);
           }
           
@@ -597,7 +628,7 @@
 
           div.onclick = () => {
             const bookToAdd = {
-              title: comic.title,
+              title: seriesItem.title,
               image: thumbnail ? `${thumbnail.path}.${thumbnail.extension}` : ''
             };
             myBooks.push(bookToAdd);
@@ -609,10 +640,10 @@
         });
 
         // Add show more button if there are more results
-        if (data.data.total > offset + comics.length) {
+        if (data.data.total > offset + series.length) {
           const showMore = document.createElement("div");
           showMore.className = "show-more";
-          const remaining = data.data.total - (offset + comics.length);
+          const remaining = data.data.total - (offset + series.length);
           showMore.textContent = `Load more... (${remaining} remaining)`;
           showMore.onclick = () => {
             currentPage++;
