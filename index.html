@@ -382,44 +382,14 @@
   </div>
 
   <script>
+    // Make sure all variables and functions are in global scope
     const myBooks = [];
     const bookshelf = document.getElementById("bookshelf");
     let currentPage = 1;
     let currentQuery = "";
 
-    function renderBooks() {
-      bookshelf.innerHTML = "";
-
-      const addCard = document.createElement("div");
-      addCard.className = "add-book-card";
-      addCard.innerHTML = "+";
-      addCard.onclick = () => {
-        document.getElementById("addBookPanel").classList.remove("hidden");
-        document.getElementById("addBookSearch").focus();
-      };
-      bookshelf.appendChild(addCard);
-
-      myBooks.forEach((book) => {
-        const card = document.createElement("div");
-        card.className = "comic-card";
-
-        const img = document.createElement("img");
-        img.src = book.image || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDE4MCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRTlFQ0VGIi8+Cjx0ZXh0IHg9IjkwIiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZDNzU3RCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==";
-        img.alt = book.title;
-        img.onerror = function() {
-          this.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDE4MCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRTlFQ0VGIi8+Cjx0ZXh0IHg9IjkwIiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZDNzU3RCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==";
-        };
-
-        const title = document.createElement("h3");
-        title.textContent = book.title;
-
-        card.appendChild(img);
-        card.appendChild(title);
-        bookshelf.appendChild(card);
-      });
-    }
-
-    async function searchSuperHeroes(query, page = 1) {
+    // Make sure searchSuperHeroes is available globally
+    window.searchSuperHeroes = async function(query, page = 1) {
       const searchResults = document.getElementById("searchResults");
       if (page === 1) {
         searchResults.innerHTML = "<div class='search-loading'>Searching SuperHero Database...</div>";
@@ -524,7 +494,7 @@
           showMore.textContent = `Load more... (${filteredResults.length - endIndex} remaining)`;
           showMore.onclick = () => {
             currentPage++;
-            searchSuperHeroes(currentQuery, currentPage);
+            window.searchSuperHeroes(currentQuery, currentPage);
           };
           searchResults.appendChild(showMore);
         }
@@ -533,35 +503,85 @@
         console.error('Search error:', error);
         searchResults.innerHTML = `<div class='search-error'>Search failed: ${error.message}<br><br>Please try again or check your internet connection.</div>`;
       }
+    };
+
+    function renderBooks() {
+      bookshelf.innerHTML = "";
+
+      const addCard = document.createElement("div");
+      addCard.className = "add-book-card";
+      addCard.innerHTML = "+";
+      addCard.onclick = () => {
+        document.getElementById("addBookPanel").classList.remove("hidden");
+        document.getElementById("addBookSearch").focus();
+      };
+      bookshelf.appendChild(addCard);
+
+      myBooks.forEach((book) => {
+        const card = document.createElement("div");
+        card.className = "comic-card";
+
+        const img = document.createElement("img");
+        img.src = book.image || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDE4MCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRTlFQ0VGIi8+Cjx0ZXh0IHg9IjkwIiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZDNzU3RCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==";
+        img.alt = book.title;
+        img.onerror = function() {
+          this.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDE4MCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRTlFQ0VGIi8+Cjx0ZXh0IHg9IjkwIiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZDNzU3RCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==";
+        };
+
+        const title = document.createElement("h3");
+        title.textContent = book.title;
+
+        card.appendChild(img);
+        card.appendChild(title);
+        bookshelf.appendChild(card);
+      });
     }
 
-    function closePanel() {
+    // Make closePanel globally available
+    window.closePanel = function() {
       document.getElementById("addBookPanel").classList.add("hidden");
       document.getElementById("searchResults").innerHTML = "";
       document.getElementById("addBookSearch").value = "";
       currentPage = 1;
-    }
+    };
 
-    document.getElementById("addBookSearchBtn").addEventListener("click", () => {
-      const query = document.getElementById("addBookSearch").value.trim();
-      if (query.length > 0) {
-        currentQuery = query;
-        currentPage = 1;
-        searchSuperHeroes(currentQuery, currentPage);
+    // Wait for DOM to be fully loaded before setting up event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set up event listeners
+      const searchBtn = document.getElementById("addBookSearchBtn");
+      const searchInput = document.getElementById("addBookSearch");
+
+      if (searchBtn) {
+        searchBtn.addEventListener("click", () => {
+          const query = searchInput.value.trim();
+          if (query.length > 0) {
+            currentQuery = query;
+            currentPage = 1;
+            window.searchSuperHeroes(currentQuery, currentPage);
+          }
+        });
       }
-    });
 
-    document.getElementById("addBookSearch").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        document.getElementById("addBookSearchBtn").click();
+      if (searchInput) {
+        searchInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+              currentQuery = query;
+              currentPage = 1;
+              window.searchSuperHeroes(currentQuery, currentPage);
+            }
+          }
+        });
       }
-    });
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closePanel();
-    });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") window.closePanel();
+      });
 
-    renderBooks();
+      // Initial render
+      renderBooks();
+    });
   </script>
 </body>
 </html>
