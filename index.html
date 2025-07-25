@@ -26,12 +26,13 @@
 
   <script>
     const API_KEY = "12a10514a29ee249fdcde1c533ac7347c4833727";
-    const API_URL = "https://comicvine.gamespot.com/api/search/";
+    const API_URL = "https://comicvine.gamespot.com/api/volumes/";
     const PROXY = "https://api.allorigins.win/raw?url=";
 
     const myBooks = [];
     const bookshelf = document.getElementById("bookshelf");
     let currentQuery = "";
+    let currentPage = 1;
 
     function renderBooks() {
       bookshelf.innerHTML = "";
@@ -45,7 +46,7 @@
       };
       bookshelf.appendChild(addCard);
 
-      myBooks.forEach((book) => {
+      myBooks.forEach((book, index) => {
         const card = document.createElement("div");
         card.className = "comic-card";
 
@@ -56,6 +57,20 @@
         const title = document.createElement("h3");
         title.textContent = book.title;
 
+        const header = document.createElement("div");
+        header.className = "book-card-header";
+
+        const toggle = document.createElement("button");
+        toggle.className = "toggle-state";
+        toggle.textContent = book.state === "read" ? "📖" : "🌟";
+        toggle.onclick = (e) => {
+          e.stopPropagation();
+          book.state = book.state === "read" ? "wishlist" : "read";
+          toggle.textContent = book.state === "read" ? "📖" : "🌟";
+        };
+
+        header.appendChild(toggle);
+        card.appendChild(header);
         card.appendChild(img);
         card.appendChild(title);
         bookshelf.appendChild(card);
@@ -66,28 +81,31 @@
       document.getElementById("addBookPanel").classList.add("hidden");
       document.getElementById("searchResults").innerHTML = "";
       document.getElementById("addBookSearch").value = "";
+      currentPage = 1;
     };
 
-    window.searchComics = async function (query) {
+    window.searchComics = async function (query, page = 1) {
       const searchResults = document.getElementById("searchResults");
-      searchResults.innerHTML = "<div class='search-loading'>Searching ComicVine for volumes...</div>";
+      if (page === 1) searchResults.innerHTML = "<div class='search-loading'>Searching ComicVine volumes...</div>";
 
       try {
-        const fullURL = `${API_URL}?api_key=${API_KEY}&format=json&resources=volume&query=${encodeURIComponent(query)}&limit=12`;
-        const proxyURL = `${PROXY}${encodeURIComponent(fullURL)}`;
-        console.log("🔎 ComicVine Volume API URL:", proxyURL);
+        const limit = 12;
+        const offset = (page - 1) * limit;
+        const endpoint = `${API_URL}?api_key=${API_KEY}&format=json&filter=name:${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`;
+        const url = `${PROXY}${encodeURIComponent(endpoint)}`;
+        console.log("🔎 ComicVine Volume API URL:", url);
 
-        const res = await fetch(proxyURL);
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         const data = await res.json();
 
         const results = data?.results || [];
-        if (results.length === 0) {
+        if (page === 1) searchResults.innerHTML = "";
+
+        if (results.length === 0 && page === 1) {
           searchResults.innerHTML = "<div class='search-loading'>No comic volumes found.</div>";
           return;
         }
-
-        searchResults.innerHTML = "";
 
         results.forEach((volume) => {
           const div = document.createElement("div");
@@ -116,7 +134,8 @@
           div.onclick = () => {
             myBooks.push({
               title: volume.name || "Untitled",
-              image: volume.image?.original_url || ""
+              image: volume.image?.original_url || "",
+              state: "wishlist"
             });
             renderBooks();
             closePanel();
@@ -124,6 +143,21 @@
 
           searchResults.appendChild(div);
         });
+
+        // Remove any existing Show More buttons before adding a new one
+        const existingShowMore = searchResults.querySelector(".show-more");
+        if (existingShowMore) existingShowMore.remove();
+
+        if (results.length === limit) {
+          const showMore = document.createElement("div");
+          showMore.className = "show-more";
+          showMore.textContent = "Show More...";
+          showMore.onclick = () => {
+            currentPage++;
+            window.searchComics(currentQuery, currentPage);
+          };
+          searchResults.appendChild(showMore);
+        }
 
       } catch (error) {
         console.error("Search error:", error);
@@ -140,7 +174,8 @@
         const query = document.getElementById("addBookSearch").value.trim();
         if (query) {
           currentQuery = query;
-          window.searchComics(currentQuery);
+          currentPage = 1;
+          window.searchComics(currentQuery, currentPage);
         }
       });
 
@@ -149,7 +184,8 @@
           const query = e.target.value.trim();
           if (query) {
             currentQuery = query;
-            window.searchComics(currentQuery);
+            currentPage = 1;
+            window.searchComics(currentQuery, currentPage);
           }
         }
       });

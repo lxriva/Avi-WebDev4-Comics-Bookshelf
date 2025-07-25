@@ -360,3 +360,19 @@ h1 {
         font-size: 2rem;
     }
 }
+
+.book-card-header {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.toggle-state {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
