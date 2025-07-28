@@ -4,6 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
   <title>Comics Bookshelf</title>
 
   <link rel="icon"
@@ -12,7 +17,17 @@
 </head>
 
 <body>
-  <h1>Comics Bookshelf</h1>
+  <div class="header-shelf">
+    <h1>Comics Bookshelf</h1>
+  </div>
+
+  <div class="button-shelf">
+    <button id="exportButton">📤 Export</button>
+    <input type="file" id="importInput" style="display: none;" />
+    <button id="importButton">📥 Import</button>
+  </div>
+
+
   <div id="bookshelf" class="bookshelf"></div>
 
   <div id="addBookPanel" class="panel hidden">
@@ -68,8 +83,18 @@
           book.state = book.state === "read" ? "wishlist" : "read";
           toggle.textContent = book.state === "read" ? "📖" : "🌟";
         };
+        
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-book";
+        delBtn.textContent = "❌";
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          myBooks.splice(index, 1);
+          renderBooks();
+        };
 
         header.appendChild(toggle);
+        header.appendChild(delBtn);
         card.appendChild(header);
         card.appendChild(img);
         card.appendChild(title);
@@ -196,7 +221,48 @@
 
       renderBooks();
     });
-  </script>
+  
+// ✅ Export bookshelf as JSON file
+document.getElementById("exportButton").addEventListener("click", () => {
+  const dataStr = JSON.stringify(myBooks, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "bookshelf.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ✅ Import bookshelf from JSON file
+document.getElementById("importButton").addEventListener("click", () => {
+  document.getElementById("importInput").click();
+});
+
+document.getElementById("importInput").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        myBooks.length = 0;
+        myBooks.push(...imported);
+        renderBooks();
+      } else {
+        alert("Invalid bookshelf format.");
+      }
+    } catch (err) {
+      alert("Error importing bookshelf.");
+    }
+  };
+  reader.readAsText(file);
+});
+
+</script>
 </body>
 
 </html>

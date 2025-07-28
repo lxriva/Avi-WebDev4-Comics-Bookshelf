@@ -16,6 +16,8 @@ image source: https://stock.adobe.com/sg/images/comic-book-city-vector-cartoon-s
 - 🎨 Seamless **comic-style cityscape background**
 - 🔄 Built for **responsive devices**
 - 🧠 Zero backend — runs entirely client-side
+- 📤📥 **Import/Export Bookshelf** — Save your comics to a `.json` file or load them back later
+- 🗑️ **Delete Button** — Remove comics from your shelf easily
 
 ---
 
@@ -48,6 +50,18 @@ image source: https://stock.adobe.com/sg/images/comic-book-city-vector-cartoon-s
 
 4. Toggle between 📖 **Read** or 🌟 **Wishlist**.
 
+### 📤📥 Import/Export Buttons
+
+These are located just below the main heading and allow you to:
+
+- **Export** your current bookshelf as a `.json` file
+- **Import** a previously saved bookshelf JSON
+
+### 🗑️ Delete Button
+
+Each comic card has a delete button (🗑️) in the top right corner.
+Clicking it will remove the comic from your shelf.
+
 > ⚠️ **Note**: ComicVine images may not load on certain restricted networks (e.g. office Wi-Fi). Use a hotspot or test from home for full functionality.
 
 ---
@@ -67,8 +81,13 @@ image source: https://stock.adobe.com/sg/images/comic-book-city-vector-cartoon-s
 
 ## 📌 Roadmap
 
+- [x] Add comic volumes by search
+- [x] Toggle between Read / Wishlist
+- [x] Mini bookshelf design with wood styling
+- [x] Comic-style heading + buttons layout
+- [x] Import/Export bookshelf JSON
+- [x] Delete books from shelf
 - [ ] Save bookshelf to `localStorage`
-- [ ] Manual import/export (JSON backup)
 - [ ] Light/Dark theme toggle
 - [ ] Filter by Read / Wishlist
 - [ ] Marvel mode (stretch goal 👀)
