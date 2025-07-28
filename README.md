@@ -90,7 +90,6 @@ Clicking it will remove the comic from your shelf.
 - [ ] Save bookshelf to `localStorage`
 - [ ] Light/Dark theme toggle
 - [ ] Filter by Read / Wishlist
-- [ ] Marvel mode (stretch goal 👀)
 
 ---
 
