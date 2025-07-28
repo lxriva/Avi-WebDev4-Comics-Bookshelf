@@ -3,6 +3,7 @@
 A sleek, Apple Books–inspired web app to collect, preview, and wishlist your favorite **DC comic volumes**, powered by the **ComicVine API**.
 
 ![screenshot](assets/background.jpg)
+image source: https://stock.adobe.com/sg/images/comic-book-city-vector-cartoon-seamless-pattern-vintage-superhero-action-texture-skyscrapers-and-fight-bubbles-decorative-background-childish-wallpaper-wrapping-paper-textile-design/286260891
 
 ---
 
