@@ -114,6 +114,7 @@
           const img = document.createElement("img");
           img.src = volume.image?.original_url || "";
           img.alt = volume.name;
+          console.log("Image URL:", volume.image?.original_url);
 
           const infoDiv = document.createElement("div");
           infoDiv.className = "search-result-info";
