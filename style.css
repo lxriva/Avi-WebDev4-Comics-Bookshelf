@@ -584,6 +584,8 @@ h1 {
 .search-result img {
     width: 65px;
     height: 95px;
+    min-width: 65px;
+    min-height: 95px;
     object-fit: cover;
     border-radius: 8px;
     background: linear-gradient(135deg, #e9ecef, #dee2e6);
