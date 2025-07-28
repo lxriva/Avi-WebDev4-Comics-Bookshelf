@@ -87,10 +87,10 @@ Clicking it will remove the comic from your shelf.
 - [x] Comic-style heading + buttons layout
 - [x] Import/Export bookshelf JSON
 - [x] Delete books from shelf
-- [x] Save bookshelf to `localStorage`
-- [x] Light/Dark theme toggle
+- [ ] Save bookshelf to `localStorage`
+- [ ] Light/Dark theme toggle
 - [ ] Filter by Read / Wishlist
-- [ ] Chatbot for comic enquiries
+- [ ] Marvel mode (stretch goal 👀)
 
 ---
 

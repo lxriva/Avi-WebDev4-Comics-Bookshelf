@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comics Chatbot</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #ffcc00;
+      margin-bottom: 1rem;
+    }
+    #chat {
+      width: 100%;
+      max-width: 600px;
+      background: #222;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+    }
+    .message {
+      margin: 1rem 0;
+    }
+    .user {
+      color: #87cefa;
+    }
+    .bot {
+      color: #90ee90;
+    }
+    input, button {
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .error {
+      color: #ff6666;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Ask the DC Comics Librarian</h1>
+  <div id="chat"></div>
+  <input type="text" id="userInput" placeholder="Ask a question like 'Tell me about Watchmen'...">
+  <button onclick="sendMessage()">Ask</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chat = document.getElementById("chat");
+      const question = input.value.trim();
+      if (!question) return;
+
+      chat.innerHTML += `<div class='message user'><b>You:</b> ${question}</div>`;
+      input.value = "";
+
+      try {
+        const res = await fetch("http://localhost:5000/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (data.answer) {
+          chat.innerHTML += `<div class='message bot'><b>Librarian:</b> ${data.answer}</div>`;
+        } else {
+          chat.innerHTML += `<div class='message bot error'><b>Error:</b> ${data.error}</div>`;
+        }
+      } catch (err) {
+        chat.innerHTML += `<div class='message bot error'><b>Fetch Error:</b> ${err.message}</div>`;
+      }
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
